@@ -36,7 +36,7 @@ tasks.withType<Test> {
 }
 
 tasks.withType<Jar> {
-    archiveFileName.set("cf-ddns.jar")
+    archiveFileName.set("budget-analyzer.jar")
 }
 
 tasks.withType<KotlinCompile> {
