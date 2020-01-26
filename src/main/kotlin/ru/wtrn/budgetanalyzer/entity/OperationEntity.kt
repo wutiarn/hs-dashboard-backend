@@ -9,13 +9,14 @@ import java.util.UUID
 
 @Table("operations")
 data class OperationEntity(
-    @Id
-    val id: UUID,
     val cardPanSuffix: String,
     val timestamp: LocalDateTime,
     val merchant: String,
     val location: String,
     val amount: Amount,
     val remainingBalance: Amount,
+
+    @Id
+    val id: UUID = UUID.randomUUID(),
     val createdAt: Instant? = Instant.now()
 )

@@ -11,7 +11,7 @@ import java.time.temporal.ChronoField
 class MtsBankSmsParser {
 
     @Suppress("SimpleRedundantLet")
-    fun parseMessage(message: String, receivedAt: LocalDateTime): MtsBankPaymentMessagePayload? {
+    fun parseMessage(message: String, receivedAt: LocalDateTime): MtsBankPaymentMessagePayload {
         // Oplata *3947; 18.01 09:47; VKUSVILL 0123 4>MOSCOW RU; 89,40 RUB; Ostatok: 20 210,64 RUB; Sobstvennye sredstva: 210,64 RUB; Kredit: 20 000,00 RUB
         // Oplata *3947; 26.01 13:03; VKUSVILL 0123 2>MOSCOW RU; 188,40 RUB; Limit: 9 225,12 RUB
         if (!message.startsWith("Oplata")) {
