@@ -1,6 +1,7 @@
 package ru.wtrn.budgetanalyzer.configuration
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.r2dbc.pool.PoolingConnectionFactoryProvider.INITIAL_SIZE
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
@@ -9,6 +10,7 @@ import io.r2dbc.spi.ConnectionFactoryOptions.DRIVER
 import io.r2dbc.spi.ConnectionFactoryOptions.HOST
 import io.r2dbc.spi.ConnectionFactoryOptions.PASSWORD
 import io.r2dbc.spi.ConnectionFactoryOptions.PORT
+import io.r2dbc.spi.ConnectionFactoryOptions.PROTOCOL
 import io.r2dbc.spi.ConnectionFactoryOptions.USER
 import org.postgresql.ds.PGSimpleDataSource
 import org.springframework.boot.autoconfigure.liquibase.DataSourceClosingSpringLiquibase
@@ -30,7 +32,9 @@ class R2dbcConfiguration(
 ) : AbstractR2dbcConfiguration() {
     private val connectionFactory = ConnectionFactories.get(
         ConnectionFactoryOptions.builder()
-            .option(DRIVER, "postgresql")
+            .option(DRIVER, "pool")
+            .option(PROTOCOL, "postgresql")
+            .option(INITIAL_SIZE, 1)
             .option(HOST, dbProperties.host)
             .option(PORT, dbProperties.port)
             .option(USER, dbProperties.username)

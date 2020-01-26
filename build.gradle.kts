@@ -28,6 +28,7 @@ dependencies {
 
     implementation("org.springframework.data:spring-data-r2dbc:1.0.0.RELEASE")
     implementation("io.r2dbc:r2dbc-postgresql:0.8.0.RELEASE")
+    implementation("io.r2dbc:r2dbc-pool:0.8.0.RELEASE")
     implementation("org.postgresql:postgresql")
     implementation("org.liquibase:liquibase-core")
     implementation("javax.xml.bind:jaxb-api") // required for liquibase
