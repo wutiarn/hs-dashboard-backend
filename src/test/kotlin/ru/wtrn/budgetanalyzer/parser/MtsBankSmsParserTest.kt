@@ -5,8 +5,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import ru.wtrn.budgetanalyzer.model.Amount
 import strikt.api.expect
+import strikt.api.expectCatching
 import strikt.api.expectThat
+import strikt.assertions.failed
+import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.Currency
@@ -66,5 +70,19 @@ internal class MtsBankSmsParserTest {
                 )
             )
         )
+    }
+
+    @Test
+    fun testNonTransactionalMessage() {
+        val msg = "Perevod na kartu *3947; 16.01 08:50; MTSBANK TO (MTS)>MOSCOW RU; 15 800,00 RUB; " +
+                "Ostatok: 22 352,63 RUB; Sobstvennye sredstva: 2 352,63 RUB; Kredit: 20 000,00 RUB"
+        expectCatching {
+            parser.parseMessage(
+                message = msg,
+                receivedAt = receivedAt
+            )
+        }
+            .failed()
+            .isA<IllegalArgumentException>()
     }
 }
