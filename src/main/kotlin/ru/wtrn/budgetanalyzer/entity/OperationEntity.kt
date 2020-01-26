@@ -1,0 +1,21 @@
+package ru.wtrn.budgetanalyzer.entity
+
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Table
+import ru.wtrn.budgetanalyzer.model.Amount
+import java.time.Instant
+import java.time.LocalDateTime
+import java.util.UUID
+
+@Table("operations")
+data class OperationEntity(
+    @Id
+    val id: UUID,
+    val cardPanSuffix: String,
+    val timestamp: LocalDateTime,
+    val merchant: String,
+    val location: String,
+    val amount: Amount,
+    val remainingBalance: Amount,
+    val createdAt: Instant? = Instant.now()
+)

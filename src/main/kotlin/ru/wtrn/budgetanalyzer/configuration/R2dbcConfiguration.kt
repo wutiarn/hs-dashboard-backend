@@ -19,6 +19,8 @@ import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration
 import org.springframework.data.r2dbc.connectionfactory.R2dbcTransactionManager
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions
 import ru.wtrn.budgetanalyzer.configuration.properties.DbProperties
+import ru.wtrn.budgetanalyzer.support.converter.JsonbReadingConverter
+import ru.wtrn.budgetanalyzer.support.converter.JsonbWritingConverter
 import ru.wtrn.budgetanalyzer.support.converter.UuidConverterOverride
 
 @Configuration
@@ -44,6 +46,8 @@ class R2dbcConfiguration(
     override fun r2dbcCustomConversions(): R2dbcCustomConversions {
         return R2dbcCustomConversions(
             listOf(
+                jsonbWritingConverter(),
+                JsonbReadingConverter(objectMapper),
                 UuidConverterOverride()
             )
         )
@@ -53,6 +57,9 @@ class R2dbcConfiguration(
     fun transactionManager(): R2dbcTransactionManager {
         return R2dbcTransactionManager(connectionFactory)
     }
+
+    @Bean
+    fun jsonbWritingConverter() = JsonbWritingConverter(objectMapper)
 
     @Bean
     fun liquibase(): DataSourceClosingSpringLiquibase {
