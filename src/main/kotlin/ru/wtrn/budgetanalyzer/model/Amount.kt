@@ -3,7 +3,7 @@ package ru.wtrn.budgetanalyzer.model
 import java.math.BigDecimal
 import java.util.Currency
 
-class Amount(
+data class Amount(
     val value: BigDecimal,
     val currency: Currency
 ) {
