@@ -15,8 +15,7 @@ class SmsMessageRoutingService(
     private val mtsBankSmsParser: MtsBankSmsParser,
     private val smsHookProperties: SmsHookProperties,
     private val transactionRepository: TransactionRepository,
-    private val telegramMessageService: TelegramMessageService,
-    private val budgetAnalyzerTelegramProperties: BudgetAnalyzerTelegramProperties
+    private val notificationsService: NotificationsService
 ) {
     suspend fun handleMessage(message: SmsMessage) {
         if (message.secret != smsHookProperties.secret) {
@@ -28,7 +27,7 @@ class SmsMessageRoutingService(
             receivedAt = message.timestamp
         )
 
-        val operationEntity = TransactionEntity(
+        val transactionEntity = TransactionEntity(
             cardPanSuffix = parsedMessage.panSuffix,
             timestamp = parsedMessage.timestamp,
             merchant = parsedMessage.merchant,
@@ -36,12 +35,8 @@ class SmsMessageRoutingService(
             amount = parsedMessage.amount,
             remainingBalance = parsedMessage.remainingBalance
         )
+        transactionRepository.insert(transactionEntity)
 
-        transactionRepository.insert(operationEntity)
-
-        telegramMessageService.sendMessage(
-            chat = budgetAnalyzerTelegramProperties.targetChat,
-            text = "${operationEntity.amount.value} ${operationEntity.amount.currency.currencyCode} ${operationEntity.merchant}"
-        )
+        notificationsService.sendTransactionNotification(transactionEntity)
     }
 }
