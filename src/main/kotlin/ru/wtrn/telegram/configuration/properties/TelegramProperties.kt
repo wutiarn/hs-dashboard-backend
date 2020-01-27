@@ -8,5 +8,10 @@ import org.springframework.boot.context.properties.ConstructorBinding
 data class TelegramProperties(
     val webhookKey: String,
     val botKey: String,
-    val httpProxy: String? = null
-)
+    val proxy: ProxyProperties
+) {
+    data class ProxyProperties(
+        val host: String,
+        val port: Int
+    )
+}

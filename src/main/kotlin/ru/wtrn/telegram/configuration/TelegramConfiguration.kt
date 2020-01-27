@@ -20,11 +20,12 @@ class TelegramConfiguration(
 ) {
     val webClient = let {
         var httpClient = HttpClient.create()
-        telegramProperties.httpProxy?.let { proxy ->
+        telegramProperties.proxy?.let { proxy ->
             httpClient = httpClient.tcpConfiguration {
                 it.proxy {
                     it.type(ProxyProvider.Proxy.HTTP)
-                        .host(proxy)
+                        .host(proxy.host)
+                        .port(proxy.port)
                 }
             }
         }
