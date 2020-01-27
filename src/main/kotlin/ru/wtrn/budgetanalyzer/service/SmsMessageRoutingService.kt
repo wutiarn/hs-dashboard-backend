@@ -3,18 +3,18 @@ package ru.wtrn.budgetanalyzer.service
 import org.springframework.stereotype.Service
 import ru.wtrn.budgetanalyzer.configuration.properties.BudgetAnalyzerTelegramProperties
 import ru.wtrn.budgetanalyzer.configuration.properties.SmsHookProperties
-import ru.wtrn.budgetanalyzer.entity.OperationEntity
+import ru.wtrn.budgetanalyzer.entity.TransactionEntity
 import ru.wtrn.budgetanalyzer.exception.UnknownSmsHookSecretException
 import ru.wtrn.budgetanalyzer.model.SmsMessage
 import ru.wtrn.budgetanalyzer.parser.MtsBankSmsParser
-import ru.wtrn.budgetanalyzer.repository.OperationRepository
+import ru.wtrn.budgetanalyzer.repository.TransactionRepository
 import ru.wtrn.telegram.service.TelegramMessageService
 
 @Service
 class SmsMessageRoutingService(
     private val mtsBankSmsParser: MtsBankSmsParser,
     private val smsHookProperties: SmsHookProperties,
-    private val operationRepository: OperationRepository,
+    private val transactionRepository: TransactionRepository,
     private val telegramMessageService: TelegramMessageService,
     private val budgetAnalyzerTelegramProperties: BudgetAnalyzerTelegramProperties
 ) {
@@ -28,7 +28,7 @@ class SmsMessageRoutingService(
             receivedAt = message.timestamp
         )
 
-        val operationEntity = OperationEntity(
+        val operationEntity = TransactionEntity(
             cardPanSuffix = parsedMessage.panSuffix,
             timestamp = parsedMessage.timestamp,
             merchant = parsedMessage.merchant,
@@ -37,7 +37,7 @@ class SmsMessageRoutingService(
             remainingBalance = parsedMessage.remainingBalance
         )
 
-        operationRepository.insert(operationEntity)
+        transactionRepository.insert(operationEntity)
 
         telegramMessageService.sendMessage(
             chat = budgetAnalyzerTelegramProperties.targetChat,

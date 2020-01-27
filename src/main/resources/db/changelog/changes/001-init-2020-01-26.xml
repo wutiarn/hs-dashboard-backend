@@ -7,7 +7,7 @@
 
     <changeSet id="001-init-01" author="romanov.dv">
         <sql>
-            create table operations
+            create table transactions
             (
                 id                uuid primary key,
                 card_pan_suffix   varchar(4)                  not null,

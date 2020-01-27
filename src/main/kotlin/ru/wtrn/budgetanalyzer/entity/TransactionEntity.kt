@@ -7,8 +7,8 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.util.UUID
 
-@Table("operations")
-data class OperationEntity(
+@Table("transactions")
+data class TransactionEntity(
     val cardPanSuffix: String,
     val timestamp: LocalDateTime,
     val merchant: String,
