@@ -1,5 +1,6 @@
 package ru.wtrn.budgetanalyzer.service
 
+import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import ru.wtrn.budgetanalyzer.configuration.properties.BudgetAnalyzerTelegramProperties
 import ru.wtrn.budgetanalyzer.configuration.properties.SmsHookProperties
@@ -17,24 +18,23 @@ class SmsMessageRoutingService(
     private val transactionRepository: TransactionRepository,
     private val notificationsService: NotificationsService
 ) {
+    private val logger = KotlinLogging.logger {  }
+
     suspend fun handleMessage(message: SmsMessage) {
         if (message.secret != smsHookProperties.secret) {
             throw UnknownSmsHookSecretException()
         }
 
-        val parsedMessage = mtsBankSmsParser.parseMessage(
-            message = message.body,
-            receivedAt = message.timestamp
-        )
+        val transactionEntity = when (message.from) {
+            "MTS-Bank" -> mtsBankSmsParser.parseForTransaction(
+                message = message.body,
+                receivedAt = message.timestamp
+            )
+            else -> return
+        }
 
-        val transactionEntity = TransactionEntity(
-            cardPanSuffix = parsedMessage.panSuffix,
-            timestamp = parsedMessage.timestamp,
-            merchant = parsedMessage.merchant,
-            location = parsedMessage.location,
-            amount = parsedMessage.amount,
-            remainingBalance = parsedMessage.remainingBalance
-        )
+        logger.info { "Creating ${transactionEntity.id} transaction" }
+
         transactionRepository.insert(transactionEntity)
 
         notificationsService.sendTransactionNotification(transactionEntity)

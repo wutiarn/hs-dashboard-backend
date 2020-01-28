@@ -10,6 +10,7 @@
             create table transactions
             (
                 id                uuid primary key,
+                bank              varchar(32)                 not null,
                 card_pan_suffix   varchar(4)                  not null,
                 timestamp         timestamp without time zone not null,
                 merchant          varchar(64)                 not null,

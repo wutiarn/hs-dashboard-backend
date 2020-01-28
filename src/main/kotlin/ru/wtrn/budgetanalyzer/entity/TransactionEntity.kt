@@ -9,6 +9,7 @@ import java.util.UUID
 
 @Table("transactions")
 data class TransactionEntity(
+    val bank: Bank,
     val cardPanSuffix: String,
     val timestamp: LocalDateTime,
     val merchant: String,
@@ -19,4 +20,8 @@ data class TransactionEntity(
     @Id
     val id: UUID = UUID.randomUUID(),
     val createdAt: Instant? = Instant.now()
-)
+) {
+    enum class Bank {
+        MTS_BANK
+    }
+}

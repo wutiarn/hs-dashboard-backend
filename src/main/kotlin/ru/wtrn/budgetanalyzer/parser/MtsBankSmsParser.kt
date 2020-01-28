@@ -1,6 +1,7 @@
 package ru.wtrn.budgetanalyzer.parser
 
 import org.springframework.stereotype.Component
+import ru.wtrn.budgetanalyzer.entity.TransactionEntity
 import ru.wtrn.budgetanalyzer.model.Amount
 import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
@@ -9,6 +10,18 @@ import java.time.temporal.ChronoField
 
 @Component
 class MtsBankSmsParser {
+    fun parseForTransaction(message: String, receivedAt: LocalDateTime): TransactionEntity {
+        val parsedMessage = parseMessage(message, receivedAt)
+        return TransactionEntity(
+            bank = TransactionEntity.Bank.MTS_BANK,
+            cardPanSuffix = parsedMessage.panSuffix,
+            timestamp = parsedMessage.timestamp,
+            merchant = parsedMessage.merchant,
+            location = parsedMessage.location,
+            amount = parsedMessage.amount,
+            remainingBalance = parsedMessage.remainingBalance
+        )
+    }
 
     @Suppress("SimpleRedundantLet")
     fun parseMessage(message: String, receivedAt: LocalDateTime): MtsBankPaymentMessagePayload {
