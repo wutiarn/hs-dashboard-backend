@@ -12,13 +12,12 @@ data class CalculatedDayLimit(
 ) {
     companion object {
         fun of(
-            monthStart: LocalDate,
             date: LocalDate,
             spentValue: BigDecimal,
             limitValue: BigDecimal,
             currency: Currency
         ): CalculatedDayLimit {
-            val daysRemaining = monthStart.atEndOfMonth().dayOfMonth - date.dayOfMonth + 1
+            val daysRemaining = date.atEndOfMonth().dayOfMonth - date.dayOfMonth + 1
             val calculatedLimitValue = (limitValue - spentValue) / BigDecimal(daysRemaining)
             return CalculatedDayLimit(
                 daysRemaining = daysRemaining,

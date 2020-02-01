@@ -35,18 +35,16 @@ class LimitsService(
         }
 
         val nextDay = dayLimit.periodStart.plusDays(1)
-        val nextDayCalculatedLimit = when(nextDay) {
-            monthLimit.periodStart.atEndOfMonth() -> CalculatedDayLimit.of(
-                monthStart = nextDay,
+        val nextDayCalculatedLimit = when(nextDay.monthValue == monthLimit.periodStart.monthValue) {
+            true -> CalculatedDayLimit.of(
                 date = nextDay,
-                spentValue = BigDecimal.ZERO,
+                spentValue = monthLimit.spentValue,
                 limitValue = monthLimit.limitValue,
                 currency = monthLimit.currency
             )
-            else -> CalculatedDayLimit.of(
-                monthStart = monthLimit.periodStart,
+            false -> CalculatedDayLimit.of(
                 date = nextDay,
-                spentValue = monthLimit.spentValue,
+                spentValue = BigDecimal.ZERO,
                 limitValue = monthLimit.limitValue,
                 currency = monthLimit.currency
             )

@@ -63,7 +63,6 @@ data class CurrentLimitEntity(
         ): CurrentLimitEntity {
             val validUntil = LocalDateTime.of(date, endOfTheDayTime).atZone(monthLimit.timezone).toInstant()
             val calculatedDayLimit = CalculatedDayLimit.of(
-                monthStart = monthLimit.periodStart,
                 date = date,
                 spentValue = monthLimit.spentValue,
                 limitValue = monthLimit.limitValue,
