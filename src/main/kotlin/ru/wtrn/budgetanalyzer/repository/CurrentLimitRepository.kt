@@ -2,9 +2,11 @@ package ru.wtrn.budgetanalyzer.repository
 
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.r2dbc.core.DatabaseClient
+import org.springframework.data.r2dbc.core.await
 import org.springframework.stereotype.Repository
 import ru.wtrn.budgetanalyzer.entity.CurrentLimitEntity
 import ru.wtrn.budgetanalyzer.support.CoroutineCrudRepository
+import java.math.BigDecimal
 import java.sql.Date
 import java.time.Instant
 import java.util.Currency
@@ -37,4 +39,20 @@ class CurrentLimitRepository(
             .collectList()
             .awaitSingle()
     }
+
+    suspend fun increaseSpentAmount(limitIds: List<UUID>, amountValue: BigDecimal) {
+        return databaseClient.execute(
+            //language=PostgreSQL
+            """
+                UPDATE current_limits
+                SET spent_amount = spent_amount + :amountValue
+                WHERE id in (:limitIds)
+            """.trimIndent()
+        )
+            .bind("amountValue", amountValue)
+            .bind("limitIds", limitIds)
+            .await()
+    }
+
+
 }

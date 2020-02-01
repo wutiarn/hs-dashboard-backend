@@ -11,7 +11,7 @@ class LimitsService(
     private val currentLimitRepository: CurrentLimitRepository,
     private val limitsProperties: LimitsProperties
 ) {
-    suspend fun decreaseLimit(amount: Amount) {
+    suspend fun decreaseLimit(amount: Amount): RemainingLimit {
         val foundLimits = currentLimitRepository.findActiveLimits(
             tag = LIMIT_TAG,
             currency = amount.currency
@@ -20,6 +20,25 @@ class LimitsService(
         val monthLimit = foundLimits[CurrentLimitEntity.LimitTimespan.MONTH] ?: constructMonthLimit()
         val dayLimit = foundLimits[CurrentLimitEntity.LimitTimespan.DAY] ?: constructDayLimit(monthLimit)
 
+        currentLimitRepository.increaseSpentAmount(
+            limitIds = listOf(monthLimit.id, dayLimit.id),
+            amountValue = amount.value
+        )
+
+        return RemainingLimit(
+            day = calculateRemainingAmount(dayLimit, amount),
+            month = calculateRemainingAmount(monthLimit, amount)
+        )
+    }
+
+    private fun calculateRemainingAmount(
+        limit: CurrentLimitEntity,
+        transactionAmount: Amount
+    ): Amount {
+        return Amount(
+            value = limit.limitAmount.value - (limit.spentAmount.value + transactionAmount.value),
+            currency = limit.limitAmount.currency
+        )
     }
 
     private suspend fun constructMonthLimit(): CurrentLimitEntity {
@@ -47,4 +66,9 @@ class LimitsService(
     companion object {
         private const val LIMIT_TAG = "Daily"
     }
+
+    data class RemainingLimit(
+        val day: Amount,
+        val month: Amount
+    )
 }
