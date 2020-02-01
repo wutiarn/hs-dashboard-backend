@@ -14,6 +14,7 @@
                 limit_amount jsonb                    not null,
                 tag          varchar(64)              not null,
                 timespan     varchar(32)              not null,
+                period_start date                     not null,
                 valid_until  timestamp with time zone not null,
                 created_at   timestamp with time zone not null
             );
