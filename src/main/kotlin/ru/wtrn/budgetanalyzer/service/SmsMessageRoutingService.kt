@@ -16,7 +16,8 @@ class SmsMessageRoutingService(
     private val mtsBankSmsParser: MtsBankSmsParser,
     private val smsHookProperties: SmsHookProperties,
     private val transactionRepository: TransactionRepository,
-    private val notificationsService: NotificationsService
+    private val notificationsService: NotificationsService,
+    private val limitsService: LimitsService
 ) {
     private val logger = KotlinLogging.logger {  }
 
@@ -37,6 +38,8 @@ class SmsMessageRoutingService(
 
         transactionRepository.insert(transactionEntity)
 
-        notificationsService.sendTransactionNotification(transactionEntity)
+        val remainingLimit = limitsService.decreaseLimit(transactionEntity.amount)
+
+        notificationsService.sendTransactionNotification(transactionEntity, remainingLimit)
     }
 }

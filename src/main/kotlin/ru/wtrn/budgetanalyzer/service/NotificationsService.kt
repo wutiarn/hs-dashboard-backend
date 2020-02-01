@@ -10,10 +10,12 @@ class NotificationsService(
     private val telegramMessageService: TelegramMessageService,
     private val budgetAnalyzerTelegramProperties: BudgetAnalyzerTelegramProperties
 ) {
-    suspend fun sendTransactionNotification(transactionEntity: TransactionEntity) {
+    suspend fun sendTransactionNotification(transactionEntity: TransactionEntity, remainingLimit: LimitsService.RemainingLimit) {
         val text = """
             ${transactionEntity.amount} ${transactionEntity.merchant}
-            Limit: ${transactionEntity.remainingBalance}
+            Day: ${remainingLimit.day.value}
+            Month: ${remainingLimit.month.currency}
+            Card balance: ${transactionEntity.remainingBalance}
             """.trimIndent()
 
         telegramMessageService.sendMessage(
