@@ -13,18 +13,14 @@
                 spent_value  decimal                  not null,
                 limit_value  decimal                  not null,
                 currency     varchar(3)               not null,
-                tag          varchar(64)              not null,
                 timespan     varchar(32)              not null,
                 timezone     varchar(32)              not null,
                 period_start date                     not null,
                 valid_until  timestamp with time zone not null,
                 created_at   timestamp with time zone not null
             );
-            create index current_limits_tag_valid_until_idx
-                on current_limits (
-                                   tag,
-                                   valid_until
-                    )
+            create index current_limits_valid_until_idx
+                on current_limits (valid_until)
         </sql>
     </changeSet>
 </databaseChangeLog>
