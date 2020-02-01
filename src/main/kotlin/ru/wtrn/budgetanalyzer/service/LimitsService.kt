@@ -4,7 +4,10 @@ import org.springframework.stereotype.Service
 import ru.wtrn.budgetanalyzer.configuration.properties.LimitsProperties
 import ru.wtrn.budgetanalyzer.entity.CurrentLimitEntity
 import ru.wtrn.budgetanalyzer.model.Amount
+import ru.wtrn.budgetanalyzer.model.CalculatedDayLimit
 import ru.wtrn.budgetanalyzer.repository.CurrentLimitRepository
+import ru.wtrn.budgetanalyzer.util.atEndOfMonth
+import java.math.BigDecimal
 
 @Service
 class LimitsService(
@@ -25,9 +28,26 @@ class LimitsService(
             amountValue = amount.value
         )
 
+        val nextDay = dayLimit.periodStart.plusDays(1)
+        val nextDayCalculatedLimit = when(nextDay) {
+            monthLimit.periodStart.atEndOfMonth() -> CalculatedDayLimit.of(
+                monthStart = nextDay,
+                date = nextDay,
+                spentValue = BigDecimal.ZERO,
+                limitValue = monthLimit.limitValue
+            )
+            else -> CalculatedDayLimit.of(
+                monthStart = monthLimit.periodStart,
+                date = nextDay,
+                spentValue = monthLimit.spentValue,
+                limitValue = monthLimit.limitValue
+            )
+        }
+
         return RemainingLimit(
             day = calculateRemainingAmount(dayLimit, amount),
-            month = calculateRemainingAmount(monthLimit, amount)
+            month = calculateRemainingAmount(monthLimit, amount),
+            nextDayCalculatedLimit = nextDayCalculatedLimit
         )
     }
 
@@ -56,8 +76,7 @@ class LimitsService(
 
     private suspend fun constructDayLimit(monthLimit: CurrentLimitEntity): CurrentLimitEntity {
         val entity = CurrentLimitEntity.constructDayLimit(
-            monthLimit = monthLimit,
-            timezone = limitsProperties.timezone
+            monthLimit = monthLimit
         )
         currentLimitRepository.insert(entity)
         return entity
@@ -69,6 +88,7 @@ class LimitsService(
 
     data class RemainingLimit(
         val day: Amount,
-        val month: Amount
+        val month: Amount,
+        val nextDayCalculatedLimit: CalculatedDayLimit
     )
 }

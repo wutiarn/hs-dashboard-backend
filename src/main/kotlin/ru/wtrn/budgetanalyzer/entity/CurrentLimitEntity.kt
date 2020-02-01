@@ -2,6 +2,7 @@ package ru.wtrn.budgetanalyzer.entity
 
 import org.springframework.data.relational.core.mapping.Table
 import ru.wtrn.budgetanalyzer.model.Amount
+import ru.wtrn.budgetanalyzer.model.CalculatedDayLimit
 import ru.wtrn.budgetanalyzer.service.LimitsService
 import ru.wtrn.budgetanalyzer.util.atEndOfMonth
 import java.math.BigDecimal
@@ -21,6 +22,7 @@ data class CurrentLimitEntity(
 
     val tag: String,
     val timespan: LimitTimespan,
+    val timezone: ZoneId,
     val validUntil: Instant,
     val periodStart: LocalDate,
 
@@ -36,9 +38,10 @@ data class CurrentLimitEntity(
         fun constructMonthLimit(
             tag: String,
             timezone: ZoneId,
-            limitAmount: Amount
+            limitAmount: Amount,
+            today: LocalDate = LocalDate.now(timezone)
         ): CurrentLimitEntity {
-            val periodStart = LocalDate.now(timezone)
+            val periodStart = today
                 .withDayOfMonth(1)
 
             val validUntil = let {
@@ -49,6 +52,7 @@ data class CurrentLimitEntity(
             return CurrentLimitEntity(
                 tag = tag,
                 periodStart = periodStart,
+                timezone = timezone,
                 spentValue = BigDecimal.ZERO,
                 limitValue = limitAmount.value,
                 currency = limitAmount.currency,
@@ -57,18 +61,23 @@ data class CurrentLimitEntity(
             )
         }
 
-        fun constructDayLimit(monthLimit: CurrentLimitEntity, timezone: ZoneId): CurrentLimitEntity {
-            val today = LocalDate.now(timezone)
-            val validUntil = LocalDateTime.of(today, endOfTheDayTime).atZone(timezone).toInstant()
-            val daysRemaining = monthLimit.periodStart.atEndOfMonth().dayOfMonth - today.dayOfMonth + 1
-
-            val limitValue = (monthLimit.limitValue - monthLimit.spentValue) / BigDecimal(daysRemaining)
-
+        fun constructDayLimit(
+            monthLimit: CurrentLimitEntity,
+            date: LocalDate = LocalDate.now(monthLimit.timezone)
+        ): CurrentLimitEntity {
+            val validUntil = LocalDateTime.of(date, endOfTheDayTime).atZone(monthLimit.timezone).toInstant()
+            val calculatedDayLimit = CalculatedDayLimit.of(
+                monthStart = monthLimit.periodStart,
+                date = date,
+                spentValue = monthLimit.spentValue,
+                limitValue = monthLimit.limitValue
+            )
             return CurrentLimitEntity(
                 tag = monthLimit.tag,
-                periodStart = today,
+                periodStart = date,
+                timezone = monthLimit.timezone,
                 spentValue = BigDecimal.ZERO,
-                limitValue = limitValue,
+                limitValue = calculatedDayLimit.limitValue,
                 currency = monthLimit.currency,
                 validUntil = validUntil,
                 timespan = LimitTimespan.DAY
