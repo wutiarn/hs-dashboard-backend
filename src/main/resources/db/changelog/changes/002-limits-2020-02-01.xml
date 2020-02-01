@@ -10,8 +10,9 @@
             create table current_limits
             (
                 id           uuid primary key,
-                spent_amount jsonb                    not null,
-                limit_amount jsonb                    not null,
+                spent_value  decimal                  not null,
+                limit_value  decimal                  not null,
+                currency     varchar(3)               not null,
                 tag          varchar(64)              not null,
                 timespan     varchar(32)              not null,
                 period_start date                     not null,

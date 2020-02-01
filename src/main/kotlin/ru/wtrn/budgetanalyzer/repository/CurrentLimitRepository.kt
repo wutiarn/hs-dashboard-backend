@@ -28,7 +28,6 @@ class CurrentLimitRepository(
                 FROM current_limits
                 WHERE tag = :tag 
                 AND valid_until > :validUntilGt
-                
             """.trimIndent()
         )
             .bind("tag", tag)
@@ -45,7 +44,7 @@ class CurrentLimitRepository(
             //language=PostgreSQL
             """
                 UPDATE current_limits
-                SET spent_amount = spent_amount + :amountValue
+                SET spent_value = spent_value + :amountValue
                 WHERE id in (:limitIds)
             """.trimIndent()
         )
@@ -53,6 +52,4 @@ class CurrentLimitRepository(
             .bind("limitIds", limitIds)
             .await()
     }
-
-
 }

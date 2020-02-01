@@ -10,12 +10,14 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import java.util.Currency
 import java.util.UUID
 
 @Table("current_limits")
 data class CurrentLimitEntity(
-    val spentAmount: Amount,
-    val limitAmount: Amount,
+    val spentValue: BigDecimal,
+    val limitValue: BigDecimal,
+    val currency: Currency,
 
     val tag: String,
     val timespan: LimitTimespan,
@@ -47,11 +49,9 @@ data class CurrentLimitEntity(
             return CurrentLimitEntity(
                 tag = tag,
                 periodStart = periodStart,
-                spentAmount = Amount(
-                    value = BigDecimal.ZERO,
-                    currency = limitAmount.currency
-                ),
-                limitAmount = limitAmount,
+                spentValue = BigDecimal.ZERO,
+                limitValue = limitAmount.value,
+                currency = limitAmount.currency,
                 timespan = LimitTimespan.MONTH,
                 validUntil = validUntil
             )
@@ -62,19 +62,14 @@ data class CurrentLimitEntity(
             val validUntil = LocalDateTime.of(today, endOfTheDayTime).atZone(timezone).toInstant()
             val daysRemaining = monthLimit.periodStart.atEndOfMonth().dayOfMonth - today.dayOfMonth + 1
 
-            val limitValue = (monthLimit.limitAmount.value - monthLimit.spentAmount.value) / BigDecimal(daysRemaining)
+            val limitValue = (monthLimit.limitValue - monthLimit.spentValue) / BigDecimal(daysRemaining)
 
             return CurrentLimitEntity(
                 tag = monthLimit.tag,
                 periodStart = today,
-                spentAmount = Amount(
-                    value = BigDecimal.ZERO,
-                    currency = monthLimit.limitAmount.currency
-                ),
-                limitAmount = Amount(
-                    value = limitValue,
-                    currency = monthLimit.limitAmount.currency
-                ),
+                spentValue = BigDecimal.ZERO,
+                limitValue = limitValue,
+                currency = monthLimit.currency,
                 validUntil = validUntil,
                 timespan = LimitTimespan.DAY
             )

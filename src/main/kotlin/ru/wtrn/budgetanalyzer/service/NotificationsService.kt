@@ -13,8 +13,8 @@ class NotificationsService(
     suspend fun sendTransactionNotification(transactionEntity: TransactionEntity, remainingLimit: LimitsService.RemainingLimit) {
         val text = """
             ${transactionEntity.amount} ${transactionEntity.merchant}
-            Day: ${remainingLimit.day.value}
-            Month: ${remainingLimit.month.currency}
+            Day: ${remainingLimit.day}
+            Month: ${remainingLimit.month}
             Card balance: ${transactionEntity.remainingBalance}
             """.trimIndent()
 

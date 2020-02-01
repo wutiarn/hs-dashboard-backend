@@ -36,8 +36,8 @@ class LimitsService(
         transactionAmount: Amount
     ): Amount {
         return Amount(
-            value = limit.limitAmount.value - (limit.spentAmount.value + transactionAmount.value),
-            currency = limit.limitAmount.currency
+            value = limit.limitValue - (limit.spentValue + transactionAmount.value),
+            currency = limit.currency
         )
     }
 

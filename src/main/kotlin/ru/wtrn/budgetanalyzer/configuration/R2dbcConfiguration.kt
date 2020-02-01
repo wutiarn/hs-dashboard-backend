@@ -21,6 +21,8 @@ import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration
 import org.springframework.data.r2dbc.connectionfactory.R2dbcTransactionManager
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions
 import ru.wtrn.budgetanalyzer.configuration.properties.DbProperties
+import ru.wtrn.budgetanalyzer.support.converter.CurrencyReadingConverter
+import ru.wtrn.budgetanalyzer.support.converter.CurrencyWritingConverter
 import ru.wtrn.budgetanalyzer.support.converter.JsonbReadingConverter
 import ru.wtrn.budgetanalyzer.support.converter.JsonbWritingConverter
 import ru.wtrn.budgetanalyzer.support.converter.UuidConverterOverride
@@ -52,7 +54,9 @@ class R2dbcConfiguration(
             listOf(
                 jsonbWritingConverter(),
                 JsonbReadingConverter(objectMapper),
-                UuidConverterOverride()
+                UuidConverterOverride(),
+                CurrencyReadingConverter(),
+                CurrencyWritingConverter()
             )
         )
     }
