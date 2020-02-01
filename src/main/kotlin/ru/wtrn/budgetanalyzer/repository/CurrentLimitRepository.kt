@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository
 import ru.wtrn.budgetanalyzer.entity.CurrentLimitEntity
 import ru.wtrn.budgetanalyzer.support.CoroutineCrudRepository
 import java.math.BigDecimal
-import java.sql.Date
 import java.time.Instant
 import java.util.Currency
 import java.util.UUID
@@ -20,17 +19,15 @@ class CurrentLimitRepository(
     idColumn = "id",
     databaseClient = databaseClient
 ) {
-    suspend fun findActiveLimits(tag: String, currency: Currency): List<CurrentLimitEntity> {
+    suspend fun findActiveLimits(currency: Currency): List<CurrentLimitEntity> {
         return databaseClient.execute(
             //language=PostgreSQL
             """
                 SELECT *
                 FROM current_limits
-                WHERE tag = :tag 
-                AND valid_until > :validUntilGt
+                WHERE valid_until > :validUntilGt
             """.trimIndent()
         )
-            .bind("tag", tag)
             .bind("validUntilGt", Instant.now())
             .`as`(domainType)
             .fetch()

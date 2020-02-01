@@ -2,14 +2,11 @@ package ru.wtrn.budgetanalyzer.service
 
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
-import ru.wtrn.budgetanalyzer.configuration.properties.BudgetAnalyzerTelegramProperties
 import ru.wtrn.budgetanalyzer.configuration.properties.SmsHookProperties
-import ru.wtrn.budgetanalyzer.entity.TransactionEntity
 import ru.wtrn.budgetanalyzer.exception.UnknownSmsHookSecretException
 import ru.wtrn.budgetanalyzer.model.SmsMessage
 import ru.wtrn.budgetanalyzer.parser.MtsBankSmsParser
 import ru.wtrn.budgetanalyzer.repository.TransactionRepository
-import ru.wtrn.telegram.service.TelegramMessageService
 
 @Service
 class SmsMessageRoutingService(
@@ -38,7 +35,7 @@ class SmsMessageRoutingService(
 
         transactionRepository.insert(transactionEntity)
 
-        val remainingLimit = limitsService.decreaseLimit(transactionEntity.amount)
+        val remainingLimit = limitsService.increaseSpentAmount(transactionEntity.amount)
 
         notificationsService.sendTransactionNotification(transactionEntity, remainingLimit)
     }

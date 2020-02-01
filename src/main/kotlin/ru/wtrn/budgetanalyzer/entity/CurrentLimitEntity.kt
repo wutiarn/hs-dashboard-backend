@@ -19,7 +19,6 @@ data class CurrentLimitEntity(
     val limitValue: BigDecimal,
     val currency: Currency,
 
-    val tag: String,
     val timespan: LimitTimespan,
     val timezone: ZoneId,
     val validUntil: Instant,
@@ -35,7 +34,6 @@ data class CurrentLimitEntity(
 
     companion object {
         fun constructMonthLimit(
-            tag: String,
             timezone: ZoneId,
             limitAmount: Amount,
             today: LocalDate = LocalDate.now(timezone)
@@ -49,7 +47,6 @@ data class CurrentLimitEntity(
             }
 
             return CurrentLimitEntity(
-                tag = tag,
                 periodStart = periodStart,
                 timezone = timezone,
                 spentValue = BigDecimal.ZERO,
@@ -73,7 +70,6 @@ data class CurrentLimitEntity(
                 currency = monthLimit.currency
             )
             return CurrentLimitEntity(
-                tag = monthLimit.tag,
                 periodStart = date,
                 timezone = monthLimit.timezone,
                 spentValue = BigDecimal.ZERO,

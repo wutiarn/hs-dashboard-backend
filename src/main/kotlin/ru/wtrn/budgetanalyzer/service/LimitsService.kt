@@ -16,9 +16,8 @@ class LimitsService(
     private val currentLimitRepository: CurrentLimitRepository,
     private val limitsProperties: LimitsProperties
 ) {
-    suspend fun decreaseLimit(amount: Amount): ResultingLimits {
+    suspend fun increaseSpentAmount(amount: Amount): ResultingLimits {
         val foundLimits = currentLimitRepository.findActiveLimits(
-            tag = LIMIT_TAG,
             currency = amount.currency
         )
             .associateBy { it.timespan }
@@ -62,7 +61,6 @@ class LimitsService(
 
     private suspend fun constructMonthLimit(): CurrentLimitEntity {
         val entity = CurrentLimitEntity.constructMonthLimit(
-            tag = LIMIT_TAG,
             limitAmount = Amount(
                 value = limitsProperties.daily,
                 currency = limitsProperties.currency
@@ -79,10 +77,6 @@ class LimitsService(
         )
         currentLimitRepository.insert(entity)
         return entity
-    }
-
-    companion object {
-        private const val LIMIT_TAG = "Daily"
     }
 
     data class ResultingLimits(
