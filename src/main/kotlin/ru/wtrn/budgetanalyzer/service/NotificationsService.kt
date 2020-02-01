@@ -30,11 +30,11 @@ class NotificationsService(
 
     suspend fun sendManualLimitUpdateNotification(
         amount: Amount,
-        description: String,
+        description: String?,
         resultingLimits: LimitsService.ResultingLimits
     ) {
         val text = """
-            $amount $description
+            $amount ${description ?: ""}
             Осталось: ${resultingLimits.todayLimit.remainingAmount} из ${resultingLimits.todayLimit.limitAmount} 
             Завтра: ${resultingLimits.nextDayCalculatedLimit.limitAmount}
             До конца месяца: ${resultingLimits.monthLimit.remainingAmount}

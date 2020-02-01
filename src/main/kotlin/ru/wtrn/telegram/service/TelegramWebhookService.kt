@@ -54,7 +54,7 @@ class TelegramWebhookService(
         val (amountValue, description) = try {
             val parts = message.text.split(" ", limit = 2)
             val amountValue = BigDecimal(parts.first())
-            val description = parts[1]
+            val description = parts.getOrNull(1)
             amountValue to description
         } catch (e: Exception) {
             // Let's pretend nothing happened. Probably message was not addressed to bot.
