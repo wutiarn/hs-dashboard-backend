@@ -3,7 +3,6 @@ package ru.wtrn.budgetanalyzer.entity
 import org.springframework.data.relational.core.mapping.Table
 import ru.wtrn.budgetanalyzer.model.Amount
 import ru.wtrn.budgetanalyzer.model.CalculatedDayLimit
-import ru.wtrn.budgetanalyzer.service.LimitsService
 import ru.wtrn.budgetanalyzer.util.atEndOfMonth
 import java.math.BigDecimal
 import java.time.Instant
@@ -16,7 +15,7 @@ import java.util.UUID
 
 @Table("current_limits")
 data class CurrentLimitEntity(
-    val spentValue: BigDecimal,
+    var spentValue: BigDecimal,
     val limitValue: BigDecimal,
     val currency: Currency,
 
@@ -70,14 +69,15 @@ data class CurrentLimitEntity(
                 monthStart = monthLimit.periodStart,
                 date = date,
                 spentValue = monthLimit.spentValue,
-                limitValue = monthLimit.limitValue
+                limitValue = monthLimit.limitValue,
+                currency = monthLimit.currency
             )
             return CurrentLimitEntity(
                 tag = monthLimit.tag,
                 periodStart = date,
                 timezone = monthLimit.timezone,
                 spentValue = BigDecimal.ZERO,
-                limitValue = calculatedDayLimit.limitValue,
+                limitValue = calculatedDayLimit.limitAmount.value,
                 currency = monthLimit.currency,
                 validUntil = validUntil,
                 timespan = LimitTimespan.DAY

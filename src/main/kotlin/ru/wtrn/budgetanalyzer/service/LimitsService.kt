@@ -7,6 +7,8 @@ import ru.wtrn.budgetanalyzer.model.Amount
 import ru.wtrn.budgetanalyzer.model.CalculatedDayLimit
 import ru.wtrn.budgetanalyzer.repository.CurrentLimitRepository
 import ru.wtrn.budgetanalyzer.util.atEndOfMonth
+import ru.wtrn.budgetanalyzer.util.remainingAmount
+import ru.wtrn.budgetanalyzer.util.spentAmount
 import java.math.BigDecimal
 
 @Service
@@ -14,13 +16,14 @@ class LimitsService(
     private val currentLimitRepository: CurrentLimitRepository,
     private val limitsProperties: LimitsProperties
 ) {
-    suspend fun decreaseLimit(amount: Amount): RemainingLimit {
+    suspend fun decreaseLimit(amount: Amount): ResultingLimits {
         val foundLimits = currentLimitRepository.findActiveLimits(
             tag = LIMIT_TAG,
             currency = amount.currency
-        ).associateBy { it.timespan }
+        )
+            .associateBy { it.timespan }
 
-        val monthLimit = foundLimits[CurrentLimitEntity.LimitTimespan.MONTH] ?: constructMonthLimit()
+        val monthLimit = (foundLimits[CurrentLimitEntity.LimitTimespan.MONTH] ?: constructMonthLimit())
         val dayLimit = foundLimits[CurrentLimitEntity.LimitTimespan.DAY] ?: constructDayLimit(monthLimit)
 
         currentLimitRepository.increaseSpentAmount(
@@ -28,36 +31,32 @@ class LimitsService(
             amountValue = amount.value
         )
 
+        listOf(dayLimit, monthLimit).forEach {
+            it.spentValue += amount.value
+        }
+
         val nextDay = dayLimit.periodStart.plusDays(1)
         val nextDayCalculatedLimit = when(nextDay) {
             monthLimit.periodStart.atEndOfMonth() -> CalculatedDayLimit.of(
                 monthStart = nextDay,
                 date = nextDay,
                 spentValue = BigDecimal.ZERO,
-                limitValue = monthLimit.limitValue
+                limitValue = monthLimit.limitValue,
+                currency = monthLimit.currency
             )
             else -> CalculatedDayLimit.of(
                 monthStart = monthLimit.periodStart,
                 date = nextDay,
                 spentValue = monthLimit.spentValue,
-                limitValue = monthLimit.limitValue
+                limitValue = monthLimit.limitValue,
+                currency = monthLimit.currency
             )
         }
 
-        return RemainingLimit(
-            day = calculateRemainingAmount(dayLimit, amount),
-            month = calculateRemainingAmount(monthLimit, amount),
+        return ResultingLimits(
+            todayLimit = dayLimit,
+            monthLimit = monthLimit,
             nextDayCalculatedLimit = nextDayCalculatedLimit
-        )
-    }
-
-    private fun calculateRemainingAmount(
-        limit: CurrentLimitEntity,
-        transactionAmount: Amount
-    ): Amount {
-        return Amount(
-            value = limit.limitValue - (limit.spentValue + transactionAmount.value),
-            currency = limit.currency
         )
     }
 
@@ -86,9 +85,9 @@ class LimitsService(
         private const val LIMIT_TAG = "Daily"
     }
 
-    data class RemainingLimit(
-        val day: Amount,
-        val month: Amount,
+    data class ResultingLimits(
+        val todayLimit: CurrentLimitEntity,
+        val monthLimit: CurrentLimitEntity,
         val nextDayCalculatedLimit: CalculatedDayLimit
     )
 }
