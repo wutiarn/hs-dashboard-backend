@@ -22,9 +22,13 @@ class TelegramHookController(
         @RequestBody request: String
     ) {
         logger.info { request }
-        telegramWebhookService.handleWebhook(
-            webhookKey = webhookKey,
-            requestBody = request
-        )
+        try {
+            telegramWebhookService.handleWebhook(
+                webhookKey = webhookKey,
+                requestBody = request
+            )
+        } catch (e: Exception) {
+            logger.warn(e) { "Exception occurred in telegramWebhookService" }
+        }
     }
 }

@@ -10,6 +10,7 @@ import ru.wtrn.budgetanalyzer.configuration.properties.BudgetAnalyzerTelegramPro
 import ru.wtrn.budgetanalyzer.configuration.properties.LimitsProperties
 import ru.wtrn.budgetanalyzer.model.Amount
 import ru.wtrn.budgetanalyzer.service.LimitsService
+import ru.wtrn.budgetanalyzer.service.ManualLimitUpdateService
 import ru.wtrn.budgetanalyzer.service.NotificationsService
 import ru.wtrn.telegram.configuration.properties.TelegramProperties
 import ru.wtrn.telegram.dto.hook.TelegramUpdate
@@ -23,11 +24,10 @@ class TelegramWebhookService(
     private val objectMapper: ObjectMapper,
     private val budgetAnalyzerTelegramProperties: BudgetAnalyzerTelegramProperties,
     private val telegramMessageService: TelegramMessageService,
-    private val limitsService: LimitsService,
-    private val limitsProperties: LimitsProperties,
-    private val notificationsService: NotificationsService
+    private val manualLimitUpdateService: ManualLimitUpdateService,
+    private val limitsProperties: LimitsProperties
 ) {
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
 
     @Suppress("DeferredResultUnused")
     suspend fun handleWebhook(
@@ -67,11 +67,10 @@ class TelegramWebhookService(
             currency = limitsProperties.currency
         )
 
-        val resultingLimits = limitsService.increaseSpentAmount(amount)
-        notificationsService.sendManualLimitUpdateNotification(
+        manualLimitUpdateService.increaseSpentAmount(
             amount = amount,
             description = description,
-            resultingLimits = resultingLimits
+            user = message.from.username ?: message.from.id.toString()
         )
     }
 }
