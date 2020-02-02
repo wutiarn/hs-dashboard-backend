@@ -35,7 +35,7 @@ class LimitsService(
         }
 
         val nextDay = dayLimit.periodStart.plusDays(1)
-        val nextDayCalculatedLimit = when(nextDay.monthValue == monthLimit.periodStart.monthValue) {
+        val nextDayCalculatedLimit = when (nextDay.monthValue == monthLimit.periodStart.monthValue) {
             true -> CalculatedDayLimit.of(
                 date = nextDay,
                 spentValue = monthLimit.spentValue,
@@ -50,10 +50,22 @@ class LimitsService(
             )
         }
 
+        val budgetBalanceAmount = let {
+            val endOfMonthDay = BigDecimal(monthLimit.periodStart.atEndOfMonth().dayOfMonth)
+            val todayDay = BigDecimal(dayLimit.periodStart.dayOfMonth)
+            val budgetBalanceValue = (monthLimit.limitValue / endOfMonthDay) * todayDay - monthLimit.spentValue
+            Amount(
+                value = budgetBalanceValue,
+                currency = dayLimit.currency
+            )
+        }
+
+
         return ResultingLimits(
             todayLimit = dayLimit,
             monthLimit = monthLimit,
-            nextDayCalculatedLimit = nextDayCalculatedLimit
+            nextDayCalculatedLimit = nextDayCalculatedLimit,
+            budgetBalanceAmount = budgetBalanceAmount
         )
     }
 
@@ -80,6 +92,7 @@ class LimitsService(
     data class ResultingLimits(
         val todayLimit: CurrentLimitEntity,
         val monthLimit: CurrentLimitEntity,
-        val nextDayCalculatedLimit: CalculatedDayLimit
+        val nextDayCalculatedLimit: CalculatedDayLimit,
+        val budgetBalanceAmount: Amount
     )
 }

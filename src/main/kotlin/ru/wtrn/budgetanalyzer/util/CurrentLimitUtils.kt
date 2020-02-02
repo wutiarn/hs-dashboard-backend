@@ -20,3 +20,9 @@ val CurrentLimitEntity.limitAmount: Amount
         value = limitValue,
         currency = currency
     )
+
+val CurrentLimitEntity.budgetBalance: Amount
+    get() = Amount(
+        value = limitValue,
+        currency = currency
+    )
