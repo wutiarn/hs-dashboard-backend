@@ -16,9 +16,9 @@ class NotificationsService(
     suspend fun sendTransactionNotification(transactionEntity: TransactionEntity, resultingLimits: LimitsService.ResultingLimits) {
         val text = """
             Баланс: ${resultingLimits.budgetBalanceAmount}
+            До конца месяца: ${resultingLimits.monthLimit.remainingAmount}  
             Сегодня: ${resultingLimits.todayLimit.remainingAmount}
             Завтра: ${resultingLimits.nextDayCalculatedLimit.limitAmount}
-            До конца месяца: ${resultingLimits.monthLimit.remainingAmount} 
             Баланс карты: ${transactionEntity.remainingBalance}
             
             ${transactionEntity.amount} ${transactionEntity.merchant}
@@ -37,9 +37,9 @@ class NotificationsService(
     ) {
         val text = """
             Баланс: ${resultingLimits.budgetBalanceAmount}
+            До конца месяца: ${resultingLimits.monthLimit.remainingAmount}
             Сегодня: ${resultingLimits.todayLimit.remainingAmount} 
             Завтра: ${resultingLimits.nextDayCalculatedLimit.limitAmount}
-            До конца месяца: ${resultingLimits.monthLimit.remainingAmount}
             
             $amount ${description ?: ""}
             """.trimIndent()
