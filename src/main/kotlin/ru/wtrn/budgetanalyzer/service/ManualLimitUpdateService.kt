@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import ru.wtrn.budgetanalyzer.entity.ManualLimitUpdateEntity
 import ru.wtrn.budgetanalyzer.model.Amount
 import ru.wtrn.budgetanalyzer.repository.ManualLimitUpdateRepository
+import java.math.BigDecimal
 
 @Service
 class ManualLimitUpdateService(
@@ -16,12 +17,14 @@ class ManualLimitUpdateService(
         description: String?,
         user: String
     ) {
-        val entity = ManualLimitUpdateEntity(
-            amountValue = amount.value,
-            description = description,
-            author = user
-        )
-        manualLimitUpdateRepository.insert(entity)
+        if (amount.value != BigDecimal.ZERO) {
+            val entity = ManualLimitUpdateEntity(
+                amountValue = amount.value,
+                description = description,
+                author = user
+            )
+            manualLimitUpdateRepository.insert(entity)
+        }
 
         val resultingLimits = limitsService.increaseSpentAmount(amount)
         notificationsService.sendManualLimitUpdateNotification(
