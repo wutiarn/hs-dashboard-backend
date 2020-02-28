@@ -4,3 +4,8 @@ logging:
 budget-analyzer:
   db:
     liquibase-changelog: classpath:db/changelog/changelog-master.xml
+spring:
+  rsocket:
+    server:
+      mapping-path: /rsocket
+      transport: websocket

@@ -16,7 +16,7 @@ class EventsStreamingController(
     private val objectMapper: ObjectMapper
 ) {
     private val logger = KotlinLogging.logger { }
-    @MessageMapping("requestEvents")
+    @MessageMapping("events")
     suspend fun requestEvents(): Flow<FrontendEventDto> = flow {
         val event = FrontendEventDto(
             timestamp =LocalDateTime.now(ZoneId.of("Europe/Moscow")).toString()
