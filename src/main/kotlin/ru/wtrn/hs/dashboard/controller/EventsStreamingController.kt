@@ -26,7 +26,7 @@ class EventsStreamingController(
             )
             logger.info { "Emitting $event" }
             emit(event)
-            delay(1000)
+            delay(5000)
         }
     }
 }
