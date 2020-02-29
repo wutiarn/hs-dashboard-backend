@@ -23,23 +23,20 @@ class TimestampEventsController(
     fun requestEvents(): Flow<TimestampEventDtp> = flow {
         var counter = 1;
         while (true) {
-//            if (counter > 30) {
-//                return@flow
-//            }
             val now = LocalDateTime.now(ZoneId.of("Europe/Moscow"))
 
-            val locale = Locale.ENGLISH
+            val locale = Locale("ru")
 
             val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-            val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd", locale)
+            val dateFormatter = DateTimeFormatter.ofPattern("dd MMMM, EEEE", locale)
 
             val timeStr = now.format(timeFormatter)
             val dateStr = now.format(dateFormatter)
 
             val nowStr = "$timeStr $dateStr"
             val event = TimestampEventDtp(
-                counter = counter++,
-                timestamp = nowStr
+                time = timeStr,
+                date = dateStr
             )
             emit(event)
             delay(1000)
