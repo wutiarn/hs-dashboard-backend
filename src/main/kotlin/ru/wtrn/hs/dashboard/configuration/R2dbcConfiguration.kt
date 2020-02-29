@@ -69,7 +69,7 @@ class R2dbcConfiguration(
     @Bean
     fun jsonbWritingConverter() = JsonbWritingConverter(objectMapper)
 
-//    @Bean
+    @Bean
     fun liquibase(): DataSourceClosingSpringLiquibase {
         val liquibaseDatasource = DataSourceBuilder.create()
             .url("jdbc:postgresql://${dbProperties.host}:${dbProperties.port}/${dbProperties.database}")
