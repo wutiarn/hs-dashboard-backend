@@ -12,3 +12,7 @@ fun BigDecimal.toLocalizedString(scale: Int = 0, roundingMode: RoundingMode = Ro
     val scaled = this.setScale(scale, roundingMode)
     return localizedFormat.format(scaled)
 }
+
+fun Int.toLocalizedString(): String {
+    return localizedFormat.format(this)
+}

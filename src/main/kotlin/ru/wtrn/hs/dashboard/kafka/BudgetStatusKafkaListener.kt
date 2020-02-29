@@ -10,13 +10,13 @@ import ru.wtrn.hs.dashboard.controller.BudgetEventsController
 import ru.wtrn.hs.dashboard.dto.front.BudgetDto
 import ru.wtrn.hs.dashboard.dto.kafka.BudgetStatusKafkaDto
 import ru.wtrn.hs.dashboard.entity.LatestEventStateEntity
-import ru.wtrn.hs.dashboard.repository.CurrentLimitRepository
+import ru.wtrn.hs.dashboard.repository.LatestEventStateRepository
 import ru.wtrn.hs.dashboard.util.toLocalizedString
 
 @Component
 class BudgetStatusKafkaListener(
     private val budgetEventsController: BudgetEventsController,
-    private val currentLimitRepository: CurrentLimitRepository
+    private val latestEventStateRepository: LatestEventStateRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -34,7 +34,7 @@ class BudgetStatusKafkaListener(
             cardBalance = request.cardBalance.toLocalizedString()
         )
 
-        currentLimitRepository.upsert(
+        latestEventStateRepository.upsert(
             type = LatestEventStateEntity.EventType.BUDGET,
             data = data
         )

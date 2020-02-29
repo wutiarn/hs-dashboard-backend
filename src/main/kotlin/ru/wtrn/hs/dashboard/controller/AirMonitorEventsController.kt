@@ -1,32 +1,39 @@
 package ru.wtrn.hs.dashboard.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import mu.KotlinLogging
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.wtrn.hs.dashboard.dto.front.AirMonitorStatusDto
+import ru.wtrn.hs.dashboard.dto.front.BudgetDto
+import ru.wtrn.hs.dashboard.entity.LatestEventStateEntity
+import ru.wtrn.hs.dashboard.repository.LatestEventStateRepository
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 @RestController
 class AirMonitorEventsController(
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val latestEventStateRepository: LatestEventStateRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
+    val channel = BroadcastChannel<AirMonitorStatusDto>(1)
+
     @MessageMapping("events.airMonitor")
     fun requestEvents(): Flow<AirMonitorStatusDto> = flow {
-        while (true) {
-            val event = AirMonitorStatusDto(
-                co2 = "1159",
-                temperature = "26.1",
-                rh = "28.5",
-                pm25 = "7.1",
-                tvoc = "280"
-            )
-            emit(event)
-            delay(1000)
+        latestEventStateRepository.retrieve(
+            type = LatestEventStateEntity.EventType.AIR_MONITOR,
+            cls = AirMonitorStatusDto::class.java
+        )?.let { initialEvent ->
+            emit(initialEvent)
+        }
+
+        channel.openSubscription().consumeEach {
+            emit(it)
         }
     }
 }

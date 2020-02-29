@@ -14,7 +14,7 @@ import java.time.Instant
 import java.util.UUID
 
 @Repository
-class CurrentLimitRepository(
+class LatestEventStateRepository(
     databaseClient: DatabaseClient,
     private val objectMapper: ObjectMapper
 ) : CoroutineCrudRepository<LatestEventStateEntity, String>(
