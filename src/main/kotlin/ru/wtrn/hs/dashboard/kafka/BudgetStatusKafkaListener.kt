@@ -28,7 +28,9 @@ class BudgetStatusKafkaListener(
         val data = BudgetDto(
             balance = request.balance.toString(),
             tomorrow = request.tomorrow.toString(),
-            today = request.today.toString()
+            today = request.today.toString(),
+            month = request.month.toString(),
+            cardBalance = request.cardBalance.toString()
         )
 
         currentLimitRepository.upsert(
