@@ -9,7 +9,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.wtrn.hs.dashboard.dto.TimestampEventDtp
 import java.time.Duration
-import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -24,7 +23,6 @@ class TimestampEventsController(
 
     @MessageMapping("events.timestamp")
     fun requestEvents(): Flow<TimestampEventDtp> = flow {
-        var counter = 1;
         while (true) {
             val now = LocalDateTime.now(ZoneId.of("Europe/Moscow"))
 
