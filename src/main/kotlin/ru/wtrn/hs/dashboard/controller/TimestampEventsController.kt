@@ -10,25 +10,37 @@ import org.springframework.web.bind.annotation.RestController
 import ru.wtrn.hs.dashboard.dto.TimestampEventDtp
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @RestController
-class EventsStreamingController(
+class TimestampEventsController(
     private val objectMapper: ObjectMapper
 ) {
     private val logger = KotlinLogging.logger { }
 
-    @MessageMapping("events")
+    @MessageMapping("events.timestamp")
     fun requestEvents(): Flow<TimestampEventDtp> = flow {
         var counter = 1;
         while (true) {
-            if (counter > 5) {
-                return@flow
-            }
+//            if (counter > 30) {
+//                return@flow
+//            }
+            val now = LocalDateTime.now(ZoneId.of("Europe/Moscow"))
+
+            val locale = Locale.ENGLISH
+
+            val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+            val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd", locale)
+
+            val timeStr = now.format(timeFormatter)
+            val dateStr = now.format(dateFormatter)
+
+            val nowStr = "$timeStr $dateStr"
             val event = TimestampEventDtp(
                 counter = counter++,
-                timestamp = LocalDateTime.now(ZoneId.of("Europe/Moscow")).toString()
+                timestamp = nowStr
             )
-            logger.info { "Emitting $event" }
             emit(event)
             delay(1000)
         }
