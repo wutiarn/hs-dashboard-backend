@@ -8,9 +8,12 @@ import mu.KotlinLogging
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.wtrn.hs.dashboard.dto.TimestampEventDtp
+import java.time.Duration
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @RestController
@@ -27,7 +30,7 @@ class TimestampEventsController(
 
             val locale = Locale("ru")
 
-            val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+            val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
             val dateFormatter = DateTimeFormatter.ofPattern("dd MMMM, EEEE", locale)
 
             val timeStr = now.format(timeFormatter)
@@ -39,7 +42,13 @@ class TimestampEventsController(
                 date = dateStr
             )
             emit(event)
-            delay(1000)
+            sleepUntilUnitChanges(now, ChronoUnit.MINUTES)
         }
+    }
+
+    private suspend fun sleepUntilUnitChanges(now: LocalDateTime, unit: ChronoUnit) {
+        val until = now.plus(1, unit).truncatedTo(unit)
+        val sleepTime = Duration.between(now, until)
+        delay(sleepTime.toMillis())
     }
 }
