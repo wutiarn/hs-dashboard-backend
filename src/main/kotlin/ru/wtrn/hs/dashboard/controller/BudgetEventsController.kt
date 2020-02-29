@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.flow
 import mu.KotlinLogging
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.wtrn.hs.dashboard.dto.BudgetDto
+import ru.wtrn.hs.dashboard.dto.front.BudgetDto
 
 @RestController
 class BudgetEventsController(

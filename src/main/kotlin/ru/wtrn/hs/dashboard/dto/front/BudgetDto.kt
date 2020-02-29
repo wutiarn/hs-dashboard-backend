@@ -1,4 +1,4 @@
-package ru.wtrn.hs.dashboard.dto
+package ru.wtrn.hs.dashboard.dto.front
 
 data class BudgetDto(
     val balance: String,
