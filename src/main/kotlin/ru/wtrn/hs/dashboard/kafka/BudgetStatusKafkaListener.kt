@@ -11,6 +11,7 @@ import ru.wtrn.hs.dashboard.dto.front.BudgetDto
 import ru.wtrn.hs.dashboard.dto.kafka.BudgetStatusKafkaDto
 import ru.wtrn.hs.dashboard.entity.LatestEventStateEntity
 import ru.wtrn.hs.dashboard.repository.CurrentLimitRepository
+import ru.wtrn.hs.dashboard.util.toLocalizedString
 
 @Component
 class BudgetStatusKafkaListener(
@@ -26,11 +27,11 @@ class BudgetStatusKafkaListener(
         logger.info { request }
 
         val data = BudgetDto(
-            balance = request.balance.toString(),
-            tomorrow = request.tomorrow.toString(),
-            today = request.today.toString(),
-            month = request.month.toString(),
-            cardBalance = request.cardBalance.toString()
+            balance = request.balance.toLocalizedString(),
+            tomorrow = request.tomorrow.toLocalizedString(),
+            today = request.today.toLocalizedString(),
+            month = request.month.toLocalizedString(),
+            cardBalance = request.cardBalance.toLocalizedString()
         )
 
         currentLimitRepository.upsert(
