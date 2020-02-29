@@ -10,11 +10,14 @@ import mu.KotlinLogging
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.wtrn.hs.dashboard.dto.front.BudgetDto
+import ru.wtrn.hs.dashboard.entity.LatestEventStateEntity
+import ru.wtrn.hs.dashboard.repository.CurrentLimitRepository
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 @RestController
 class BudgetEventsController(
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val currentLimitRepository: CurrentLimitRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -22,12 +25,17 @@ class BudgetEventsController(
 
     @MessageMapping("events.budget")
     fun requestEvents(): Flow<BudgetDto> = flow {
-        val intialEvent = BudgetDto(
-            balance = "0",
-            today = "0",
-            tomorrow = "0"
-        )
-//        emit(intialEvent)
+        currentLimitRepository.retrieve(
+            type = LatestEventStateEntity.EventType.BUDGET,
+            cls = BudgetDto::class.java
+        )?.let { initialEvent ->
+            emit(initialEvent)
+        }
+//        val intialEvent = BudgetDto(
+//            balance = "0",
+//            today = "0",
+//            tomorrow = "0"
+//        )
 
         channel.openSubscription().consumeEach {
             logger.info { "Broadcasting $it" }
