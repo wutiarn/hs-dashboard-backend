@@ -10,7 +10,7 @@ private val localizedFormat = DecimalFormat.getInstance(Locale("ru"))
 
 fun BigDecimal.toLocalizedString(scale: Int = 0, roundingMode: RoundingMode = RoundingMode.DOWN): String {
     val scaled = this.setScale(scale, roundingMode)
-    return localizedFormat.format(scaled)
+    return localizedFormat.format(scaled).replace(",", ".")
 }
 
 fun Int.toLocalizedString(): String {
