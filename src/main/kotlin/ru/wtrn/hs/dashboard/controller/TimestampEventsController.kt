@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.flow
 import mu.KotlinLogging
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.wtrn.hs.dashboard.dto.TimestampEventDtp
+import ru.wtrn.hs.dashboard.dto.TimestampEventDto
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -22,7 +22,7 @@ class TimestampEventsController(
     private val logger = KotlinLogging.logger { }
 
     @MessageMapping("events.timestamp")
-    fun requestEvents(): Flow<TimestampEventDtp> = flow {
+    fun requestEvents(): Flow<TimestampEventDto> = flow {
         while (true) {
             val now = LocalDateTime.now(ZoneId.of("Europe/Moscow"))
 
@@ -34,8 +34,7 @@ class TimestampEventsController(
             val timeStr = now.format(timeFormatter)
             val dateStr = now.format(dateFormatter)
 
-            val nowStr = "$timeStr $dateStr"
-            val event = TimestampEventDtp(
+            val event = TimestampEventDto(
                 time = timeStr,
                 date = dateStr
             )
