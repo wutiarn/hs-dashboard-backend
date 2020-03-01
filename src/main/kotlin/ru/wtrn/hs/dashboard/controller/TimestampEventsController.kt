@@ -29,7 +29,7 @@ class TimestampEventsController(
             val locale = Locale("ru")
 
             val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-            val dateFormatter = DateTimeFormatter.ofPattern("dd MMMM, EEEE", locale)
+            val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d MMMM", locale)
 
             val timeStr = now.format(timeFormatter)
             val dateStr = now.format(dateFormatter)
